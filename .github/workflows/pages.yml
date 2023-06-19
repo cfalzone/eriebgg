@@ -9,6 +9,9 @@ on:
   schedule:
     - cron: "0 0 * * *" # run every night at 12am
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -31,8 +34,6 @@ jobs:
         run: yarn run build && yarn run export && touch ./apps/web/out/.nojekyll
 
       - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4.4.1
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: public # The branch the action should deploy to.
-          FOLDER: apps/web/out # The folder the action should deploy.
+          folder: apps/web/out # The folder the action should deploy.
