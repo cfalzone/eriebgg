@@ -25,7 +25,7 @@ jobs:
         run: yarn
 
       - name: Build the Data
-        run: cd packages/games-data && ts-node src/generateData.ts
+        run: yarn run generate-data
 
       - name: Build my App
         run: yarn run build && yarn run export && touch ./apps/web/out/.nojekyll

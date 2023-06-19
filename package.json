@@ -4,6 +4,7 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
+    "generate-data": "yarn workspace games-data run generate",
     "export": "yarn workspace web run export",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
@@ -12,6 +13,7 @@
     "eslint-config-custom": "*",
     "prettier": "^2.7.1",
     "prettier-plugin-tailwindcss": "^0.1.11",
+    "ts-node": "^10.9.1",
     "turbo": "^1.9.3"
   },
   "name": "eriebgg",
