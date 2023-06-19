@@ -6,6 +6,8 @@ name: GitHub Pages deploy
 on:
   push:
     branches: [main]
+  schedule:
+    -cron: "0 0 * * *" # run every night at 12am
 
 jobs:
   build:
@@ -22,8 +24,11 @@ jobs:
       - name: Installing my packages
         run: yarn
 
+      - name: Build the Data
+        run: cd packages/games-data && ts-node src/generateData.ts
+
       - name: Build my App
-        run: yarn run build && yarn run export && touch ./out/.nojekyll
+        run: yarn run build && yarn run export && touch ./apps/web/out/.nojekyll
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4.4.1
