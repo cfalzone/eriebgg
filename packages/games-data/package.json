@@ -1,0 +1,21 @@
+{
+  "name": "games-data",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "generate": "ts-node src/generateData.ts"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^4.2.4",
+    "fs": "^0.0.1-security",
+    "node-fetch": "^2.6.6"
+  },
+  "devDependencies": {
+    "@types/node": "^20.3.1",
+    "@types/node-fetch": "^2.6.4",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.3"
+  }
+}
