@@ -28,6 +28,14 @@ export class BGGLoader {
     { username: "Peasly23", display: "Clark" },
     { username: "Kailinne", display: "Carol" },
     { username: "Wrenphilth", display: "Andrew" },
+    { username: "norbert88", display: "Jonathan" },
+    { username: "Ardyjello", display: "Mike" },
+    { username: "jimlocke1", display: "Jim" },
+    { username: "Katica00", display: "Karen" },
+    { username: "LordOfTheWyrms", display: "Rich" },
+    { username: "maggiebakestre", display: "Maggie" },
+    { username: "mathdood", display: "Zach" },
+    { username: "Zaezel", display: "Gary Overmoyer" },
   ];
 
   private collection: Map<string, BGGGame>;
