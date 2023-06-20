@@ -12,6 +12,8 @@ import {
   Text,
   Select,
   SelectItem,
+  Grid,
+  Col,
 } from '@tremor/react';
 import { ArrowLeftIcon, ArrowRightIcon, SearchIcon } from "@heroicons/react/solid";
 import { useMemo, useState } from "react";
@@ -52,9 +54,8 @@ export default function GamesTable() {
   }
 
   const paginationButtons = (withFilters = false) => (
-    <>
-      <Flex className="mt-6" justifyContent="between" alignItems="center">
-        <Button disabled={!hasPreviousPage} icon={ArrowLeftIcon} onClick={() => setPage(page - 1)}> Prev Page </Button>
+    <Grid numItems={2} className="mt-6 gap-3">
+      <Col numColSpan={2}>
         {
           withFilters &&
           <>
@@ -64,7 +65,7 @@ export default function GamesTable() {
               </label>
               <Text>Note: turning on thumbs with more than 20 per page is not advised.</Text>
             </div>
-            <Select className="ml-6" placeholder={`Per Page: ${perPage === 0 ? 'All' : perPage}`} onValueChange={(val) => doPerPage(parseInt(val))}>
+            <Select placeholder={`Per Page: ${perPage === 0 ? 'All' : perPage}`} onValueChange={(val) => doPerPage(parseInt(val))}>
               <SelectItem value="10">10</SelectItem>
               <SelectItem value="20">20</SelectItem>
               <SelectItem value="50">50</SelectItem>
@@ -73,10 +74,17 @@ export default function GamesTable() {
             </Select>
           </>
         }
-        <Button className="ml-6" disabled={!hasNextPage} icon={ArrowRightIcon} onClick={() => setPage(page + 1)}> Next Page </Button>
-      </Flex>
-      <Text className="mt-6 text-center">{perPage === 0 ? `Showing All` : `Showing Page ${page + 1} of ${totalPages + 1}`}. Total Games: {games.length}.</Text>
-    </>
+      </Col>
+      <Col>
+        <Button disabled={!hasPreviousPage} icon={ArrowLeftIcon} onClick={() => setPage(page - 1)}> Prev Page </Button>
+      </Col>
+      <Col className="text-right">
+        <Button disabled={!hasNextPage} icon={ArrowRightIcon} onClick={() => setPage(page + 1)}> Next Page </Button>
+      </Col>
+      <Col numColSpan={2}>
+        <Text className="text-center">{perPage === 0 ? `Showing All` : `Showing Page ${page + 1} of ${totalPages + 1}`}. Total Games: {games.length}.</Text>
+      </Col>
+    </Grid>
   );
 
   return (
