@@ -4,11 +4,16 @@ import fetch from "node-fetch";
 export interface BGGGame {
   id: string;
   name: string;
-  users?: string[];
+  users?: BGGUser[];
   type: string;
   image: string;
   thumb: string;
   yearPublished: string;
+}
+
+export interface BGGUser {
+  username: string;
+  display: string;
 }
 
 const rootPath = "https://www.boardgamegeek.com/xmlapi2";
@@ -18,7 +23,12 @@ export class BGGLoader {
   private static instance: BGGLoader;
 
   // List of BGG User Names that we will pull collections from
-  private users = ["cfalzone", "Peasly23"];
+  private users: BGGUser[] = [
+    { username: "cfalzone", display: "Chris" },
+    { username: "Peasly23", display: "Clark" },
+    { username: "Kailinne", display: "Carol" },
+    { username: "Wrenphilth", display: "Andrew" },
+  ];
 
   private collection: Map<string, BGGGame>;
   private parser: XMLParser;
@@ -40,10 +50,10 @@ export class BGGLoader {
     await Promise.all(this.users.map((user) => this.loadUser(user)));
   }
 
-  private async loadUser(user: string) {
-    if (!user) throw new Error("A user is required");
+  private async loadUser(user: { username: string; display: string }) {
+    if (!user.username) throw new Error("A username is required");
 
-    const bggUrl = `${rootPath}/collection?username=${user}&subtype=boardgame&excludesubtype=boardgameexpansion&own=1`;
+    const bggUrl = `${rootPath}/collection?username=${user.username}&subtype=boardgame&excludesubtype=boardgameexpansion&own=1`;
 
     try {
       const games = await this.fetchGames(bggUrl);
@@ -57,7 +67,7 @@ export class BGGLoader {
         if (colGame) game = colGame;
 
         // Add the user to list of people who own the game
-        let users: string[] = game.users ?? [];
+        let users: BGGUser[] = game.users ?? [];
         users.push(user);
         game.users = users;
 
@@ -65,7 +75,7 @@ export class BGGLoader {
         this.collection.set(game.id, game);
       });
     } catch (err) {
-      console.error(`Failed to fetch games for ${user}`, err);
+      console.error(`Failed to fetch games for ${user.username}`, err);
       throw err;
     }
   }

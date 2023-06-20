@@ -2,4 +2,4 @@ import Games from "./games.json";
 
 export { Games };
 
-export type { BGGGame } from "./bgg";
+export type { BGGGame, BGGUser } from "./bgg";
