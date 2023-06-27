@@ -5,7 +5,7 @@ import { NextPageWithLayout } from "./_app";
 const IndexPage: NextPageWithLayout = () => {
   return (
     <Flex flexDirection="col" className="px-12 py-12">
-      <Title>
+      <Title className='text-center'>
         Erie Boardgames BGG Collection Browser
       </Title>
       <p className='text-center mt-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-red-500'>

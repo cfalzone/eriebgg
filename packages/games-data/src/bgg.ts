@@ -37,6 +37,7 @@ export class BGGLoader {
     { username: "mathdood", display: "Zach" },
     { username: "Zaezel", display: "Gary" },
     { username: "Monobueno", display: "Jess" },
+    { username: "knifedoc", display: "JT" },
   ];
 
   private collection: Map<string, BGGGame>;
