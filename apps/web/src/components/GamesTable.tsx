@@ -54,6 +54,15 @@ export default function GamesTable() {
   const totalPages = perPage == 0 ? 0 : Math.ceil(games.length / perPage - 1);
   const hasNextPage = page < totalPages;
 
+  function debounce(callback, delay) {
+    let timeoutId;
+
+    return function () {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(callback, delay);
+    };
+  }
+
   const doSearch = (term: string) => {
     const params = new URLSearchParams(searchParams.toString());
     if (term) {
@@ -156,7 +165,7 @@ export default function GamesTable() {
         icon={MagnifyingGlassIcon}
         value={searchTerm}
         placeholder="Search..."
-        onChange={(e) => doSearch(e.target.value)}
+        onChange={debounce((e) => doSearch(e.target.value), 500)}
       />
 
       {paginationButtons(true)}
