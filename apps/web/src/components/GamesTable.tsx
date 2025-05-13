@@ -19,8 +19,9 @@ import {
 } from "@tremor/react";
 import { Games } from "games-data";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useDebouncedCallback } from "use-debounce";
 
 export default function GamesTable() {
   const searchParams = useSearchParams();
@@ -54,16 +55,7 @@ export default function GamesTable() {
   const totalPages = perPage == 0 ? 0 : Math.ceil(games.length / perPage - 1);
   const hasNextPage = page < totalPages;
 
-  function debounce(callback, delay) {
-    let timeoutId;
-
-    return function () {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(callback, delay);
-    };
-  }
-
-  const doSearch = (term: string) => {
+  const doSearch = useDebouncedCallback((term: string) => {
     const params = new URLSearchParams(searchParams.toString());
     if (term) {
       params.set("query", term);
@@ -72,7 +64,7 @@ export default function GamesTable() {
     }
     params.delete("page");
     router.push(`${pathname}?${params.toString()}`);
-  };
+  }, 300);
 
   const doPage = (p: number) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -163,9 +155,9 @@ export default function GamesTable() {
     <>
       <TextInput
         icon={MagnifyingGlassIcon}
-        value={searchTerm}
+        defaultValue={searchTerm}
         placeholder="Search..."
-        onChange={debounce((e) => doSearch(e.target.value), 500)}
+        onChange={(e) => doSearch(e.target.value)}
       />
 
       {paginationButtons(true)}
