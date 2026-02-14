@@ -5,6 +5,7 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "generate-data": "yarn workspace games-data run generate",
+    "generate-data:full": "yarn workspace games-data run generate:full",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
