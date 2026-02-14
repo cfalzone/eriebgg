@@ -31,7 +31,7 @@ jobs:
         run: yarn run generate-data
 
       - name: Build my App
-        run: yarn run build && yarn run export && touch ./apps/web/out/.nojekyll
+        run: yarn run build && touch ./apps/web/out/.nojekyll
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
