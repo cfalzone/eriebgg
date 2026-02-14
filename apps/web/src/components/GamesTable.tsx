@@ -19,7 +19,7 @@ import {
 } from "@tremor/react";
 import { Games } from "games-data";
 import Image from "next/image";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 
@@ -29,6 +29,12 @@ export default function GamesTable() {
   const router = useRouter();
 
   const searchTerm = searchParams.get("query") ?? "";
+  const [localQuery, setLocalQuery] = useState(searchTerm);
+
+  useEffect(() => {
+    setLocalQuery(searchTerm);
+  }, [searchTerm]);
+
   const page = parseInt(searchParams.get("page") ?? "0");
   const showThumbs = searchParams.get("thumbs") === "true" ? true : false;
   const perPage = parseInt(searchParams.get("size") ?? "20");
@@ -41,19 +47,24 @@ export default function GamesTable() {
     return 0;
   });
 
-  const displayData = useMemo(() => {
-    const start = page * perPage;
+  const { displayData, filteredCount } = useMemo(() => {
+    const q = searchTerm.trim().toLowerCase();
     const filteredGames = games.filter((g) =>
-      g.name.toString().includes(searchTerm)
+      g.name.toString().toLowerCase().includes(q)
     );
-    return perPage === 0
-      ? filteredGames
-      : filteredGames.slice(start, start + perPage);
+    const start = page * perPage;
+    const displayData =
+      perPage === 0
+        ? filteredGames
+        : filteredGames.slice(start, start + perPage);
+    return { displayData, filteredCount: filteredGames.length };
   }, [games, page, searchTerm, perPage]);
 
+  const totalPages =
+    perPage === 0 ? 1 : Math.ceil(filteredCount / perPage);
   const hasPreviousPage = page > 0;
-  const totalPages = perPage == 0 ? 0 : Math.ceil(games.length / perPage - 1);
-  const hasNextPage = page < totalPages;
+  const hasNextPage =
+    perPage === 0 ? false : page < totalPages - 1;
 
   const doSearch = useDebouncedCallback((term: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -63,7 +74,7 @@ export default function GamesTable() {
       params.delete("query");
     }
     params.delete("page");
-    router.push(`${pathname}?${params.toString()}`);
+    router.replace(`${pathname}?${params.toString()}`);
   }, 300);
 
   const doPage = (p: number) => {
@@ -143,8 +154,8 @@ export default function GamesTable() {
           <Text className="text-center">
             {perPage === 0
               ? `Showing All`
-              : `Showing Page ${page + 1} of ${totalPages + 1}`}
-            . Total Games: {games.length}.
+              : `Showing Page ${page + 1} of ${totalPages}`}
+            . Total Games: {filteredCount}.
           </Text>
         </div>
       </div>
@@ -155,9 +166,13 @@ export default function GamesTable() {
     <>
       <TextInput
         icon={MagnifyingGlassIcon}
-        defaultValue={searchTerm}
+        value={localQuery}
         placeholder="Search..."
-        onChange={(e) => doSearch(e.target.value)}
+        onChange={(e) => {
+          const value = e.target.value;
+          setLocalQuery(value);
+          doSearch(value);
+        }}
       />
 
       {paginationButtons(true)}
