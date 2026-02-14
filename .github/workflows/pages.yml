@@ -34,6 +34,6 @@ jobs:
         run: yarn run build && touch ./apps/web/out/.nojekyll
 
       - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
+        uses: JamesIves/github-pages-deploy-action@v4.8.0
         with:
-          folder: apps/web/out # The folder the action should deploy.
+          folder: apps/web/out
