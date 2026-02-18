@@ -1,7 +1,11 @@
-import "dotenv/config";
+import path from "path";
+import { config } from "dotenv";
+
+// Load .env from repo root (from packages/games-data/src we need three levels up)
+config({ path: path.resolve(__dirname, "..", "..", "..", ".env") });
+
 import { BGGLoader, BGGGame } from "./bgg";
 import { promises as fs } from "fs";
-import path from "path";
 
 const bgg = BGGLoader.getInstance();
 

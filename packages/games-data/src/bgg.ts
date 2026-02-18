@@ -17,11 +17,14 @@ export interface BGGUser {
   display: string;
 }
 
-const rootPath = "https://www.boardgamegeek.com/xmlapi2";
+// BGG requires boardgamegeek.com without "www" for API auth
+const rootPath = "https://boardgamegeek.com/xmlapi2";
 const maxTries = 3;
 const delayBetweenUsersMs = 2000;
 const requestTimeoutMs = 60000;
 const retryBaseDelayMs = 3000;
+/** Use longer backoff when BGG returns 429 (rate limit) */
+const rateLimitBaseDelayMs = 5000;
 
 /** BGG now requires a registered app token. Get one at https://boardgamegeek.com/applications */
 function getRequestHeaders(): Record<string, string> {
@@ -138,7 +141,11 @@ export class BGGLoader {
     try {
       const games = await this.fetchGames(bggUrl);
       const rawItems = games?.items?.item;
-      const items = Array.isArray(rawItems) ? rawItems : rawItems ? [rawItems] : [];
+      const items = Array.isArray(rawItems)
+        ? rawItems
+        : rawItems
+        ? [rawItems]
+        : [];
       items.forEach((g: any) => {
         // Convert the game json from BGG into an object
         let game = this.fromBgg(g);
@@ -177,7 +184,10 @@ export class BGGLoader {
       clearTimeout(timeoutId);
     } catch (err) {
       if (isRetriableNetworkError(err) && tries < maxTries) {
-        console.log(`Network error (retry ${nextTry}/${maxTries} in ${backoffMs}ms):`, (err as Error).message);
+        console.log(
+          `Network error (retry ${nextTry}/${maxTries} in ${backoffMs}ms):`,
+          (err as Error).message
+        );
         await delay(backoffMs);
         return this.fetchGames(url, nextTry);
       }
@@ -200,8 +210,20 @@ export class BGGLoader {
     if (tries >= maxTries) {
       throw new Error(`Max tries exceeded (last status ${resp.status})`);
     }
-    console.log(`Status ${resp.status} (retry ${nextTry}/${maxTries} in ${backoffMs}ms)`);
-    await delay(backoffMs);
+    const isRateLimit = resp.status === 429;
+    const backoff = isRateLimit
+      ? rateLimitBaseDelayMs * Math.pow(2, tries)
+      : backoffMs;
+    if (isRateLimit) {
+      console.log(
+        `Rate limited (429), retry ${nextTry}/${maxTries} in ${backoff}ms`
+      );
+    } else {
+      console.log(
+        `Status ${resp.status} (retry ${nextTry}/${maxTries} in ${backoff}ms)`
+      );
+    }
+    await delay(backoff);
     return this.fetchGames(url, nextTry);
   }
 
