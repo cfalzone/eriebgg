@@ -20,7 +20,7 @@ export const DefaultLayout = ({ children }: DefaultLayoutProps) => {
             aria-label="Powered by BoardGameGeek"
           >
             <img
-              src="/powered-by-bgg-reversed-rgb.svg"
+              src="./powered-by-bgg-reversed-rgb.svg"
               alt="Powered by BoardGameGeek"
               className="h-10 w-auto"
               width={200}
