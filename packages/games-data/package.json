@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "dotenv": "^17.3.1",
-    "fast-xml-parser": "^4.2.5",
+    "fast-xml-parser": "^5.3.6",
     "fs": "^0.0.1-security",
     "node-fetch": "^2.6.6"
   },
