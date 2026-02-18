@@ -19,9 +19,8 @@ import {
 } from "@tremor/react";
 import { Games } from "games-data";
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useDebouncedCallback } from "use-debounce";
 
 export default function GamesTable() {
   const searchParams = useSearchParams();
@@ -66,8 +65,9 @@ export default function GamesTable() {
   const hasNextPage =
     perPage === 0 ? false : page < totalPages - 1;
 
-  const doSearch = useDebouncedCallback((term: string) => {
+  const submitSearch = useCallback(() => {
     const params = new URLSearchParams(searchParams.toString());
+    const term = localQuery.trim();
     if (term) {
       params.set("query", term);
     } else {
@@ -75,7 +75,7 @@ export default function GamesTable() {
     }
     params.delete("page");
     router.replace(`${pathname}?${params.toString()}`);
-  }, 300);
+  }, [pathname, searchParams, localQuery, router]);
 
   const doPage = (p: number) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -164,16 +164,29 @@ export default function GamesTable() {
 
   return (
     <>
-      <TextInput
-        icon={MagnifyingGlassIcon}
-        value={localQuery}
-        placeholder="Search..."
-        onChange={(e) => {
-          const value = e.target.value;
-          setLocalQuery(value);
-          doSearch(value);
-        }}
-      />
+      <div className="flex flex-col gap-2 md:flex-row md:items-center">
+        <div className="w-full md:min-w-0 md:flex-1">
+          <TextInput
+            icon={MagnifyingGlassIcon}
+            value={localQuery}
+            placeholder="Search..."
+            onChange={(e) => setLocalQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                submitSearch();
+              }
+            }}
+          />
+        </div>
+        <Button
+          className="w-full md:w-auto"
+          icon={MagnifyingGlassIcon}
+          onClick={submitSearch}
+        >
+          Search
+        </Button>
+      </div>
 
       {paginationButtons(true)}
 
