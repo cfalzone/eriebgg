@@ -1,27 +1,60 @@
-import { BGGLoader } from "./bgg";
+import path from "path";
+import { config } from "dotenv";
+
+// Load .env from repo root (from packages/games-data/src we need three levels up)
+config({ path: path.resolve(__dirname, "..", "..", "..", ".env") });
+
+import { BGGLoader, BGGGame } from "./bgg";
 import { promises as fs } from "fs";
 
 const bgg = BGGLoader.getInstance();
 
-async function main() {
-  console.log("fetching data");
+const GAMES_JSON_PATH = path.join(__dirname, "games.json");
+const USERS_JSON_PATH = path.join(__dirname, "users.json");
 
-  const bggGames = Array.from((await bgg.getCollection()).values());
+async function main() {
+  const fullRefresh = process.argv.includes("--full-refresh");
+
+  bgg.setUsersPath(USERS_JSON_PATH);
+
+  if (!fullRefresh) {
+    try {
+      const data = await fs.readFile(GAMES_JSON_PATH, "utf-8");
+      const parsed = JSON.parse(data) as { Games?: BGGGame[] };
+      if (
+        parsed.Games &&
+        Array.isArray(parsed.Games) &&
+        parsed.Games.length > 0
+      ) {
+        bgg.setInitialCollection(parsed.Games);
+        console.log(
+          `Loaded ${parsed.Games.length} games from previous run for incremental update`
+        );
+      }
+    } catch {
+      // No previous file or invalid; start fresh
+      console.log("No previous file or invalid; starting fresh");
+    }
+  }
+
+  console.log("fetching data");
+  const collection = await bgg.getCollection();
+  const bggGames = Array.from(collection.values()).filter(
+    (g) => (g.users?.length ?? 0) > 0
+  );
 
   console.log(`fetched ${bggGames.length} games, writing data to file`);
-
   const data = { Games: bggGames };
   const json = JSON.stringify(data);
-
-  await fs.writeFile("./src/games.json", json, "utf-8");
-
+  await fs.writeFile(GAMES_JSON_PATH, json, "utf-8");
   console.log("... finished writing data");
 }
 
 main()
-  .then(async () => {
+  .then(() => {
     console.log("finished");
   })
-  .catch(async (e) => {
+  .catch((e) => {
     console.error(e);
+    process.exit(1);
   });
