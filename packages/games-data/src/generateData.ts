@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { BGGLoader, BGGGame } from "./bgg";
 import { promises as fs } from "fs";
 import path from "path";
